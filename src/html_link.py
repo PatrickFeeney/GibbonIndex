@@ -48,4 +48,4 @@ for i, topic in enumerate(topics):
         body.append(word_tag)
 
 with open("output/index_debug.html", "w") as f:
-    f.write(soup.prettify())
+    f.write(str(soup))
