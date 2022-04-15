@@ -4,8 +4,8 @@ from topic_data import load_topic_data
 
 
 topics, par_to_topic, par_texts = load_topic_data(
-    "data/gibbon_chapters_topics_lda.csv",
-    "data/gibbon_paragraphs_with_topics.csv"
+    "data/lda_cleaned_proper_nouns.csv",
+    "data/gibbon_paragraphs_with_topics_4_15.csv"
 )
 topic_word_to_par = [{} for _ in range(topics.shape[0])]
 # generate HTML with links for indexing
@@ -14,6 +14,9 @@ body = soup.html.body
 for i, par_text in enumerate(par_texts):
     par_topic = par_to_topic[i]
     for word in topics[par_topic]:
+        # ignore empty words
+        if len(word) == 0:
+            continue
         # update each instace of a topic's word with a link
         ind = par_text.lower().find(word)
         while ind != -1:
