@@ -37,11 +37,12 @@ for i, par_text in enumerate(par_texts):
 # generate index at end of page
 for i, topic in enumerate(topics):
     topic_tag = soup.new_tag("h4", id="topic%i" % (i,))
-    topic_tag.string = "Topic %i" % (i,)
+    topic_tag.string = "Topic %i (%i)" % \
+        (i, sum([len(pars) for pars in topic_word_to_par[i].values()]))
     body.append(topic_tag)
     for word, pars in topic_word_to_par[i].items():
         word_tag = soup.new_tag("p")
-        word_tag.string = word + ": "
+        word_tag.string = word + " (%i): " % (len(pars),)
         for j, par in enumerate(pars):
             par_tag = soup.new_tag("a", href="#par%i" % (par,))
             par_tag.string = "¶%i" % (par,)
