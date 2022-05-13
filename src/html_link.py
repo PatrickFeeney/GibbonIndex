@@ -19,9 +19,9 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
             while ind != -1:
                 start_ind = ind + 1
                 if (ind >= 1 and not par_text[ind - 1].isalpha()) and \
-                (ind + len(word) < len(par_text) and not par_text[ind + len(word)].isalpha()):
-                    link_str = '<a href="#topic%i">%s</a>' % \
-                        (par_topic, par_text[ind:ind + len(word)])
+                   (ind + len(word) < len(par_text) and not par_text[ind + len(word)].isalpha()):
+                    link_str = '<a href="#topic%i">%s<sup>%i</sup></a>' % \
+                        (par_topic, par_text[ind:ind + len(word)], par_topic)
                     par_text = par_text[:ind] + link_str + par_text[ind + len(word):]
                     start_ind += len(link_str)
                     # record paragraphs with links

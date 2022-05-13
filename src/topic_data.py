@@ -9,5 +9,5 @@ def load_topic_data(topic_path, par_path):
     par_to_topics = pd.read_csv(par_path)
     par_texts = np.array(par_to_topics["StringText"], dtype=str)
     # make mapping 0-indexed
-    par_to_topic = np.array(par_to_topics["LDA Topic"], dtype=int) - 1
+    par_to_topic = np.array(par_to_topics["LDA Topic"], dtype=int)
     return topics, par_to_topic, par_texts
