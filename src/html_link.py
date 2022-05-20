@@ -58,13 +58,13 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
 
 if __name__ == "__main__":
     paths_list = [
-        ("data/lda_cleaned_proper_nouns.csv", "data/gibbon_paragraphs_with_topics_4_15.csv", "output/index_debug.html"),
-        ("data/10_topics/gibbon_tm10_topics.csv", "data/10_topics/gibbon_tm10_paragraphs.csv", "output/index_10.html"),
-        ("data/25_topics/gibbon_tm25_topics.csv", "data/25_topics/gibbon_tm25_paragraphs.csv", "output/index_25.html"),
-        ("data/50_topics/gibbon_tm50_topics.csv", "data/50_topics/gibbon_tm50_paragraphs.csv", "output/index_50.html"),
-        ("data/75_topics/gibbon_tm75_topics.csv", "data/75_topics/gibbon_tm75_paragraphs.csv", "output/index_75.html"),
-        ("data/100_topics/gibbon_tm100_topics.csv", "data/100_topics/gibbon_tm100_paragraphs.csv", "output/index_100.html"),
-        ("data/bertopic/gibbon_bertopic_topics.csv", "data/bertopic/gibbon_bertopic_paragraphs.csv", "output/index_ber.html"),
+        ("data/lda_cleaned_proper_nouns.csv", "data/gibbon_paragraphs_with_topics_4_15.csv", "docs/index_debug.html"),
+        ("data/10_topics/gibbon_tm10_topics.csv", "data/10_topics/gibbon_tm10_paragraphs.csv", "docs/index_10.html"),
+        ("data/25_topics/gibbon_tm25_topics.csv", "data/25_topics/gibbon_tm25_paragraphs.csv", "docs/index_25.html"),
+        ("data/50_topics/gibbon_tm50_topics.csv", "data/50_topics/gibbon_tm50_paragraphs.csv", "docs/index_50.html"),
+        ("data/75_topics/gibbon_tm75_topics.csv", "data/75_topics/gibbon_tm75_paragraphs.csv", "docs/index_75.html"),
+        ("data/100_topics/gibbon_tm100_topics.csv", "data/100_topics/gibbon_tm100_paragraphs.csv", "docs/index_100.html"),
+        ("data/bertopic/gibbon_bertopic_topics.csv", "data/bertopic/gibbon_bertopic_paragraphs.csv", "docs/index_ber.html"),
     ]
     for topic_path, par_path, output_path in paths_list:
         topics, par_to_topic, par_texts = load_topic_data(topic_path, par_path)
