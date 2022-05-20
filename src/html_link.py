@@ -33,9 +33,13 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
         body.append(par_tag)
     # generate index at end of page
     for i, topic in enumerate(topics):
-        topic_tag = soup.new_tag("h4", id="topic%i" % (i,))
-        topic_tag.string = "Topic %i (%i)" % \
-            (i, sum([len(pars) for pars in topic_word_to_par[i].values()]))
+        topic_tag = soup.new_tag("details", id="topic%i" % (i,))
+        topic_title = soup.new_tag("b")
+        topic_title.string = f"Topic {i} " + \
+            f"({sum([len(pars) for pars in topic_word_to_par[i].values()])})"
+        topic_summary = soup.new_tag("summary")
+        topic_summary.append(topic_title)
+        topic_tag.append(topic_summary)
         body.append(topic_tag)
         for word, pars in topic_word_to_par[i].items():
             word_tag = soup.new_tag("p")
@@ -46,7 +50,7 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
                 if j != 0:
                     word_tag.append(", ")
                 word_tag.append(par_tag)
-            body.append(word_tag)
+            topic_tag.append(word_tag)
 
     with open(output_path, "w") as f:
         f.write(str(soup))
