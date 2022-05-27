@@ -4,6 +4,7 @@ from topic_data import load_topic_data
 
 
 def generate_html(topics, par_to_topic, par_texts, output_path):
+    # record paragraphs associated with each word in a topic
     topic_word_to_par = [{} for _ in range(topics.shape[0])]
     # generate HTML with links for indexing
     soup = BeautifulSoup("<html><head /><body /></html>", "html.parser")
@@ -52,8 +53,8 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
                 word_tag.append(par_tag)
             topic_tag.append(word_tag)
 
-    with open(output_path, "w") as f:
-        f.write(str(soup))
+    with open(output_path, "wb") as f:
+        f.write(str(soup).encode('utf8'))
 
 
 if __name__ == "__main__":
