@@ -12,7 +12,8 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
     # record paragraphs associated with each word in a topic
     topic_word_to_par = [{} for _ in range(topics.shape[0])]
     # generate HTML with links for indexing
-    soup = BeautifulSoup("<html><head /><body /></html>", "html.parser")
+    with open("data/html/base.html", "r") as f:
+        soup = BeautifulSoup(f, "html.parser")
     body = soup.html.body
     chapter_tag = None
     for i, par_text in enumerate(par_texts):
@@ -38,8 +39,10 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
                 start_ind = ind + 1
                 if (ind >= 1 and not par_text[ind - 1].isalpha()) and \
                    (ind + len(word) < len(par_text) and not par_text[ind + len(word)].isalpha()):
-                    link_str = '<a href="#topic%i">%s<sup>%i</sup></a>' % \
-                        (par_topic, par_text[ind:ind + len(word)], par_topic)
+                    link_str = f'<a href="#topic{par_topic}" ' + \
+                        'onclick="topicAnchorClick(this)">' + \
+                        f'{par_text[ind:ind + len(word)]}' + \
+                        f'<sup>{par_topic}</sup></a>'
                     par_text = par_text[:ind] + link_str + par_text[ind + len(word):]
                     start_ind += len(link_str)
                     # record paragraphs with links
@@ -65,7 +68,7 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
             word_tag = soup.new_tag("p")
             word_tag.string = word + " (%i): " % (len(pars),)
             for j, par in enumerate(pars):
-                par_tag = soup.new_tag("a", href="#par%i" % (par,))
+                par_tag = soup.new_tag("a", href="#par%i" % (par,), onclick="parAnchorClick(this)")
                 par_tag.string = "¶%i" % (par,)
                 if j != 0:
                     word_tag.append(", ")
