@@ -1,3 +1,5 @@
+from bisect import bisect
+
 from bs4 import BeautifulSoup
 import pandas as pd
 
@@ -8,13 +10,13 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
     # load data for chapter info
     chapter_df = pd.read_csv("data/gibbon_first_with_titles.csv")
     chapter_titles = list(chapter_df["Titles"])
-    chapter_first_pars = list(chapter_df["level_0"])
+    chapter_first_pars = sorted(list(chapter_df["level_0"]))
     # record paragraphs associated with each word in a topic
     topic_word_to_par = [{} for _ in range(topics.shape[0])]
     # generate HTML with links for indexing
     with open("data/html/base.html", "r") as f:
         soup = BeautifulSoup(f, "html.parser")
-    body = soup.html.body
+    body = soup.html.body.div
     chapter_tag = None
     for i, par_text in enumerate(par_texts):
         # handle chapter starts by adding collapsible header
@@ -69,7 +71,10 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
             word_tag.string = word + " (%i): " % (len(pars),)
             for j, par in enumerate(pars):
                 par_tag = soup.new_tag("a", href="#par%i" % (par,), onclick="parAnchorClick(this)")
-                par_tag.string = "¶%i" % (par,)
+                # create string with chapter then paragraph
+                chap_ind = bisect(chapter_first_pars, par) - 1
+                chap_par = par - chapter_first_pars[chap_ind] + 1
+                par_tag.string = f"§{chap_ind + 1}¶{chap_par}"
                 if j != 0:
                     word_tag.append(", ")
                 word_tag.append(par_tag)

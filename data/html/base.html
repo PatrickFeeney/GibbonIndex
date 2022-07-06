@@ -24,7 +24,7 @@
     </script>
     <script>
         $(document).ready(function(){
-            $("#myInput").on('keyup', function(){
+            $("#searchBar").on('keyup', function(){
                 var value = $(this).val().toLowerCase();
                 $("details").filter(function() {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
@@ -34,5 +34,8 @@
     </script>
 </head>
 <body>
+    <div class="container" style="padding-top: 20px;">
+        <input id="searchBar" type="text" placeholder="Filter chapters...">
+    </div>
 </body>
 </html>
