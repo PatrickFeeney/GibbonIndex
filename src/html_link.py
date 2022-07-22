@@ -41,7 +41,7 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
                 start_ind = ind + 1
                 if (ind >= 1 and not par_text[ind - 1].isalpha()) and \
                    (ind + len(word) < len(par_text) and not par_text[ind + len(word)].isalpha()):
-                    link_str = f'<a href="#topic{par_topic}" ' + \
+                    link_str = f'<a href="#topic{par_topic}{word}" ' + \
                         'onclick="topicAnchorClick(this)">' + \
                         f'{par_text[ind:ind + len(word)]}' + \
                         f'<sup>{par_topic}</sup></a>'
@@ -67,7 +67,7 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
         topic_tag.append(topic_summary)
         body.append(topic_tag)
         for word, pars in topic_word_to_par[i].items():
-            word_tag = soup.new_tag("p")
+            word_tag = soup.new_tag("p", id=f"topic{i}{word}")
             word_tag.string = word + " (%i): " % (len(pars),)
             for j, par in enumerate(pars):
                 par_tag = soup.new_tag("a", href="#par%i" % (par,), onclick="parAnchorClick(this)")

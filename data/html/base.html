@@ -11,9 +11,7 @@
         function topicAnchorClick(elem)
         {
             elem.parentElement.parentElement.open = false;
-            console.log(elem.getAttribute("href"));
-            console.log(document.querySelector(elem.getAttribute("href")));
-            document.querySelector(elem.getAttribute("href")).open = true;
+            document.querySelector(elem.getAttribute("href")).parentElement.open = true;
         }
 
         function parAnchorClick(elem)
