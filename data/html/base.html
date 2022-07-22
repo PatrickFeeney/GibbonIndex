@@ -8,16 +8,29 @@
     <!-- jquery -->
     <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script>
+        window.addEventListener('hashchange', function(event) {
+            details = document.querySelectorAll("details");
+            details.forEach(function(detail) {
+                detail.open = false;
+            });
+            split_ind = event.newURL.indexOf("#");
+            if (split_ind > -1)
+            {
+                cur_id = event.newURL.substring(split_ind);
+                cur_elem = document.querySelector(cur_id)
+                cur_elem.parentElement.open = true;
+                cur_elem.scrollIntoView();
+            }
+        }, false);
+    
         function topicAnchorClick(elem)
         {
-            elem.parentElement.parentElement.open = false;
-            document.querySelector(elem.getAttribute("href")).parentElement.open = true;
+            window.history.pushState({}, "", "#" + elem.parentElement.id);
         }
-
+    
         function parAnchorClick(elem)
         {
-            elem.parentElement.parentElement.open = false;
-            document.querySelector(elem.getAttribute("href")).parentElement.open = true;
+            window.history.pushState({}, "", "#" + elem.parentElement.id);
         }
     </script>
     <script>
