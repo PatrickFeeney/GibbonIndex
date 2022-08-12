@@ -10,7 +10,7 @@ def generate_html(topics, par_to_topic, par_texts, output_path):
     # load data for chapter info
     chapter_df = pd.read_csv("data/gibbon_first_with_titles.csv")
     chapter_titles = list(chapter_df["Titles"])
-    chapter_first_pars = sorted(list(chapter_df["level_0"]))
+    chapter_first_pars = list(chapter_df["level_0"])
     # record paragraphs associated with each word in a topic
     topic_word_to_par = [{} for _ in range(topics.shape[0])]
     # generate HTML with links for indexing
