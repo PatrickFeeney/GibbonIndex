@@ -8,6 +8,7 @@ matplotlib = "*"
 numpy = "*"
 pandas = "*"
 beautifulsoup4 = "*"
+lxml = "*"
 
 [dev-packages]
 flake8 = "*"
