@@ -11,3 +11,5 @@
 [LDA 100 Topics](index_100.html)
 
 [LDA Proper Nouns](index_debug.html)
+
+[Paper Index](index_paper.html)
