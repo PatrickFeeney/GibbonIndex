@@ -1,8 +1,9 @@
 from bisect import bisect
-
+import collections
 from bs4 import BeautifulSoup
 from lxml import etree
 import pandas as pd
+import re
 
 
 page_to_chap_par_df = pd.read_csv("data/gibbon_paragraph_to_page.csv", index_col=0)
@@ -85,6 +86,14 @@ def vol_page_to_par(vol_page):
     par = int(chap_par_to_par[chap + "pa01"]) + int(chap_par) - 1
     return par
 
+# def generate_detail_tag(body, soup: BeautifulSoup, cur_start_char):
+#     cur_char_tag = soup.new_tag("details")
+#     cur_char_title = soup.new_tag("b")
+#     cur_char_title.string = cur_start_char
+#     cur_char_summary = soup.new_tag("summary")
+#     cur_char_summary.append(cur_char_title)
+#     cur_char_tag.append(cur_char_summary)
+#     body.append(cur_char_tag)
 
 def generate_html(index_entries, output_path):
     par_to_page = {vol_page_to_par(page): page for page, _ in page_to_chap_par.items()}
@@ -114,42 +123,86 @@ def generate_html(index_entries, output_path):
     # append last chapter tag
     body.append(chapter_tag)
     # generate index at end of page
-    cur_start_char = ""
-    for i, index_entry in enumerate(index_entries):
-        # add new heading for new each character
-        new_start_char = index_entry.head[0].upper()
-        # checks that it follows alphabetical ordering and subsequent entry matches change
-        if cur_start_char == "" or \
-                (new_start_char != cur_start_char and
-                 new_start_char in alphabet and
-                 alphabet.index(new_start_char) - alphabet.index(cur_start_char) == 1 and
-                 i < len(index_entries) - 1 and
-                 new_start_char == index_entries[i + 1].head[0].upper()):
-            cur_start_char = new_start_char
-            cur_char_tag = soup.new_tag("details")
-            cur_char_title = soup.new_tag("b")
-            cur_char_title.string = cur_start_char
-            cur_char_summary = soup.new_tag("summary")
-            cur_char_summary.append(cur_char_title)
-            cur_char_tag.append(cur_char_summary)
-            body.append(cur_char_tag)
-        # add index entry
-        entry_tag = soup.new_tag("div", id=f"{cur_start_char}_{i}")
-        entry_tag_head = soup.new_tag("p", style="margin-bottom: 0;")
-        entry_tag_head.string = index_entry.head
-        entry_tag.append(entry_tag_head)
-        for subheader, subheader_refs in zip(index_entry.subhs, index_entry.subhs_refs):
-            subheader_ref = subheader_refs[0]
-            par_tag = soup.new_tag("a", href="#par%i" % (subheader_ref,),
-                                   style="text-indent: 1em; display: inline-block;",
-                                   onclick="parAnchorClick(this)")
-            # create string with chapter then paragraph
-            chap_ind = bisect(chapter_first_pars, subheader_ref) - 1
-            chap_par = subheader_ref - chapter_first_pars[chap_ind] + 1
-            par_tag.string = f"{subheader} §{chap_ind + 1}¶{chap_par}"
-            entry_tag.append(par_tag)
-            entry_tag.append(soup.new_tag("br"))
-        cur_char_tag.append(entry_tag)
+    # cur_start_char = ""
+    ab_dict = collections.defaultdict(list)
+    for entry in index_entries:
+        if re.search('([A-Z][a-z]+\s[A-Z][a-z]+)', entry.head) and ('(' not in entry.head) and ('Minor' not in entry.head): ## could probably find a better solution to this
+            name_list = entry.head.split(' ')
+            ab_dict[name_list[-1][0].upper()].append(entry)
+        elif entry.head[0] == '(':
+            continue
+        else:
+            ab_dict[entry.head[0].upper()].append(entry)
+    ab_dict = collections.OrderedDict(sorted(ab_dict.items(), key=lambda t: t[0]))
+    for key in ab_dict:
+        char_tag = soup.new_tag("details")
+        char_summary = soup.new_tag("summary")
+        char_title = soup.new_tag("b")
+        char_title.string = key
+
+        for i, entry in enumerate(ab_dict[key]):
+            entry_tag = soup.new_tag("div", id=f"{key}_{i}")
+            entry_tag_head = soup.new_tag("p", style="margin-bottom: 0;")
+            if entry.head[0].upper() == key:
+                entry_tag_head.string = entry.head
+            else:
+                entry_tag_head.string = entry.head.split(' ')[-1] + ', ' + ' '.join(entry.head.split(' ')[0:-1])
+            entry_tag.append(entry_tag_head)
+            for subheader, subheader_refs in zip(entry.subhs, entry.subhs_refs):
+                subheader_ref = subheader_refs[0]
+                par_tag = soup.new_tag("a", href="#par%i" % (subheader_ref,),
+                                    style="text-indent: 1em; display: inline-block;",
+                                    onclick="parAnchorClick(this)")
+                # create string with chapter then paragraph
+                chap_ind = bisect(chapter_first_pars, subheader_ref) - 1
+                chap_par = subheader_ref - chapter_first_pars[chap_ind] + 1
+                par_tag.string = f"{subheader} §{chap_ind + 1}¶{chap_par}"
+                entry_tag.append(par_tag)
+                entry_tag.append(soup.new_tag("br"))
+            char_tag.append(entry_tag)
+
+        char_summary.append(char_title)
+        char_tag.append(char_summary)
+        body.append(char_tag)
+    # for i, index_entry in enumerate(index_entries):
+    #     # # add new heading for new each character
+    #     # new_start_char = index_entry.head[0].upper()
+    #     # if (len(index_entry.split(' ')) == 2):
+    #     #     new_start_char = index_entry.split(' ')[1][0].upper()
+    #     # # checks that it follows alphabetical ordering and subsequent entry matches change
+    #     # if cur_start_char == "" or \
+    #     #         (new_start_char != cur_start_char and
+    #     #          new_start_char in alphabet and
+    #     #          alphabet.index(new_start_char) - alphabet.index(cur_start_char) == 1 and
+    #     #          i < len(index_entries) - 1 and
+    #     #          new_start_char == index_entries[i + 1].head[0].upper()):
+    #     #     cur_start_char = new_start_char
+    #     #     # generate_detail_tag(body, soup, cur_start_char)
+    #     #     cur_char_tag = soup.new_tag("details")
+    #     #     cur_char_title = soup.new_tag("b")
+    #     #     cur_char_title.string = cur_start_char
+    #     #     cur_char_summary = soup.new_tag("summary")
+    #     #     cur_char_summary.append(cur_char_title)
+    #     #     cur_char_tag.append(cur_char_summary)
+    #     #     body.append(cur_char_tag)
+    #     # add index entry
+    #     entry_tag = soup.new_tag("div", id=f"{cur_start_char}_{i}")
+    #     entry_tag_head = soup.new_tag("p", style="margin-bottom: 0;")
+    #     entry_tag_head.string = index_entry.head
+    #     entry_tag.append(entry_tag_head)
+    #     for subheader, subheader_refs in zip(index_entry.subhs, index_entry.subhs_refs):
+    #         subheader_ref = subheader_refs[0]
+    #         par_tag = soup.new_tag("a", href="#par%i" % (subheader_ref,),
+    #                                style="text-indent: 1em; display: inline-block;",
+    #                                onclick="parAnchorClick(this)")
+    #         # create string with chapter then paragraph
+    #         chap_ind = bisect(chapter_first_pars, subheader_ref) - 1
+    #         chap_par = subheader_ref - chapter_first_pars[chap_ind] + 1
+    #         par_tag.string = f"{subheader} §{chap_ind + 1}¶{chap_par}"
+    #         entry_tag.append(par_tag)
+    #         entry_tag.append(soup.new_tag("br"))
+    #     cur_char_tag.append(entry_tag)
+
     # write output
     with open(output_path, "wb") as f:
         f.write(str(soup).encode('utf8'))
