@@ -86,15 +86,6 @@ def vol_page_to_par(vol_page):
     par = int(chap_par_to_par[chap + "pa01"]) + int(chap_par) - 1
     return par
 
-# def generate_detail_tag(body, soup: BeautifulSoup, cur_start_char):
-#     cur_char_tag = soup.new_tag("details")
-#     cur_char_title = soup.new_tag("b")
-#     cur_char_title.string = cur_start_char
-#     cur_char_summary = soup.new_tag("summary")
-#     cur_char_summary.append(cur_char_title)
-#     cur_char_tag.append(cur_char_summary)
-#     body.append(cur_char_tag)
-
 def generate_html(index_entries, output_path):
     par_to_page = {vol_page_to_par(page): page for page, _ in page_to_chap_par.items()}
     # generate HTML with links for indexing
@@ -124,16 +115,20 @@ def generate_html(index_entries, output_path):
     body.append(chapter_tag)
     # generate index at end of page
     # cur_start_char = ""
-    ab_dict = collections.defaultdict(list)
+    ab_dict = collections.defaultdict(list) 
     for entry in index_entries:
         if re.search('([A-Z][a-z]+\s[A-Z][a-z]+)', entry.head) and ('(' not in entry.head) and ('Minor' not in entry.head): ## could probably find a better solution to this
             name_list = entry.head.split(' ')
+            entry.head = entry.head.split(' ')[-1] + ', ' + ' '.join(entry.head.split(' ')[0:-1])
             ab_dict[name_list[-1][0].upper()].append(entry)
         elif entry.head[0] == '(':
             continue
         else:
             ab_dict[entry.head[0].upper()].append(entry)
-    ab_dict = collections.OrderedDict(sorted(ab_dict.items(), key=lambda t: t[0]))
+    ## sort list in dict alphabetically
+    for key in ab_dict.keys():
+        ab_dict[key] = sorted(ab_dict[key], key=lambda e: e.head)
+    ab_dict = collections.OrderedDict(sorted(ab_dict.items(), key=lambda t: t[0].lower()))
     for key in ab_dict:
         char_tag = soup.new_tag("details")
         char_summary = soup.new_tag("summary")
